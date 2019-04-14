@@ -1,39 +1,34 @@
 import pandas as pd
 from bs4 import BeautifulSoup
 from selenium import webdriver
-import re
 from urllib.parse import urljoin
 import logging
 
 
-KEY_WORDS = ["Africa", "Safari", "tanzania", "big 5", "big five"]
+KEY_WORDS = ["America", "Europe", "Asia", "Africa", "Australia"]
 
 
-def cleanhtml(raw_html):
-    cleanr = re.compile('<.*?>')
-    cleantext = re.sub(cleanr, '', raw_html)
-    return cleantext
-
-
-def fetchHtml(url, delay):
-    # supply the local path of web driver.
+def fetch_html(url, delay):
+    # Supply the local path of web driver.
     # in this example we use chrome driver
     browser = webdriver.Chrome('/usr/local/bin/chromedriver')
-    # open the browser with the URL
+    # Open the browser with the URL
     # a browser windows will appear for a little while
     browser.get(url)
     browser.implicitly_wait(delay)
-    # grab the rendered HTML
+
+    # Grab the rendered HTML
     html = browser.page_source
-    # close the browser
+
+    # Close the browser
     browser.quit()
-    # return html
+
     return html
 
 
 def crawl_text(url, delay):
     # wait for the page fully loaded and get the content
-    raw_html = fetchHtml(url, delay)
+    raw_html = fetch_html(url, delay)
     soup = BeautifulSoup(raw_html, "html.parser")
     # remove HTML tags
     processed_text = soup.text
@@ -52,7 +47,7 @@ def remove_redundant(links):
     return links
 
 
-def remove_not_same_domain(homepage_url, subpage_urls):
+def remove_external_domain(homepage_url, subpage_urls):
     for subpage_url in subpage_urls:
         # Get absolute url
         subpage_url = urljoin(homepage_url, subpage_url)
@@ -62,7 +57,7 @@ def remove_not_same_domain(homepage_url, subpage_urls):
 
 
 if __name__ == '__main__':
-    df = pd.read_csv("./data/reduced_list_8.csv")
+    df = pd.read_csv("./data/check_list.csv")
     # Add columns
     for kw in KEY_WORDS:
         df["'" + kw + "'" + " on homepage"] = False
@@ -83,7 +78,7 @@ if __name__ == '__main__':
             subpage_urls.append(href.get('href'))
 
         subpage_urls = remove_redundant(subpage_urls)
-        subpage_urls = remove_not_same_domain(subpage_urls)
+        subpage_urls = remove_external_domain(subpage_urls)
 
         for subpage_url in subpage_urls:
             # Crawl the SUBPAGE
