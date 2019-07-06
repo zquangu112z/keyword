@@ -4,8 +4,10 @@ The script checks wether keywords are available in the website and its subpage o
 
 The script requires chromedriver to crawl websites using ajax request.
 
-*  The website urls are set in ./data/check_list.csv
+*  The website urls are set in `./data/check_list.csv`
 *  The keywords are set in the variable KEY_WORDS in the script
+
+Sample output: `./data/sample_output.csv`
 
 ## Env
 * Python 3.7.3
